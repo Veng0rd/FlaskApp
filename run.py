@@ -1,3 +1,3 @@
-from app import app, views
+from app import app
 
 app.run(debug=True)
