@@ -62,8 +62,6 @@ def profile():
     return render_template('profile.html', name=current_user.login)
 
 
-
-
 @app.route('/logout')
 @login_required
 def logout():
