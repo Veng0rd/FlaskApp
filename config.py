@@ -12,8 +12,6 @@ class Config(object):
 class DevelopmentConfig(Config, object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(os.getcwd(), 'app/database.db').replace('\\', '/')
     DEBUG = True
-    TESTING = True
-
 
 
 class TestingConfig(Config, object):

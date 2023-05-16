@@ -1,12 +1,11 @@
 from flask import render_template, redirect, flash, url_for, Blueprint
 from flask_login import login_user, logout_user, login_required, current_user
-
 from markupsafe import Markup
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
-from .models import User
 from .forms import LoginForm, RegisterForm
+from .models import User
 
 main = Blueprint('main', __name__)
 
