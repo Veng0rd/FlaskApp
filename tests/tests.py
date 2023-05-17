@@ -1,5 +1,6 @@
 import unittest
 
+from bs4 import BeautifulSoup
 from flask import current_app
 
 from app import create_app, db
@@ -44,26 +45,47 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(current_app.config['TESTING'])
 
     def test_signup_post_response(self):
+        """ Проверка POST запроса к /signup """
         response = self.app.test_client().post('/signup', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 
     def test_login_post_response(self):
+        """ Проверка POST запроса к /login """
         response = self.app.test_client().post('/login', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
 
-    # def test_root_profile(self):
-    #     with self.app.test_request_context('/login'):
-    #         new_user = User(id="1", email='test@example.com', login='testuser', password='password')
-    #         db.session.add(new_user)
-    #         db.session.commit()
-    #         found_user = User.query.filter_by(email='test@example.com').first()
-    #
-    #         with self.app.test_client().session_transaction() as session:
-    #             session['id'] = found_user.id
-    #
-    #         with self.app.test_request_context('/profile', method='POST'):
-    #             response = self.app.test_client().post('/profile', follow_redirects=True)
-    #             self.assertEqual(response.status_code, 200)
+    def test_profile_get_response(self):
+        """ Проверка GET запроса к /profile """
+        response = self.app.test_client().get('/profile')
+        self.assertNotEqual(response.status_code, 200)
+
+    def login(self, email, password):
+        return self.app.test_client().post('/login', data=dict(
+            email=email,
+            password=password
+        ), follow_redirects=True)
+
+    def signup(self, login, email, password):
+        return self.app.test_client().post('/signup', data=dict(
+            login=login,
+            email=email,
+            password=password,
+            password_reply=password
+        ), follow_redirects=True)
+
+    def test_login_wrong_format(self):
+        """ Проверка работы email формы на /login """
+        res = self.login('random_mail', 'randompassword')
+        soup = BeautifulSoup(res.data, 'html.parser')
+        block = soup.find('p', class_="help-block")
+        self.assertEqual(block.text, 'Неправильный формат!')
+
+    def test_signup_wrong_format(self):
+        """ Проверка работы email формы на /signup """
+        res = self.signup('randomlogin', 'mail@mailcom', 'password')
+        soup = BeautifulSoup(res.data, 'html.parser')
+        block = soup.find('p', class_="help-block")
+        self.assertEqual(block.text, 'Неправильный формат!')
 
 
 if __name__ == '__main__':
